@@ -4,11 +4,11 @@ library(finfeatures)
 
 # paths
 if (interactive()) {
-  PATH_PRICES     = file.path("D:/strategies/lowvol/prices")
-  PATH_PREDICTORS = file.path("D:/strategies/lowvol/predictors_daily")
+  PATH_PRICES     = file.path("D:/predictors/prices")
+  PATH_PREDICTORS = file.path("D:/predictors/daily")
 } else {
   PATH_PRICES = file.path("prices")
-  PATH_PREDICTORS = file.path("predictors_daily")
+  PATH_PREDICTORS = file.path("daily")
 }
 
 # Create directory if it doesnt exists
@@ -47,7 +47,6 @@ if (max(at) > min(windows)) {
     exuber_lag = 1L
   )
   exuber = exuber_init$get_rolling_features(ohlcv, TRUE)
-  fwrite(exuber, path_)
 }
 
 # Backcusum
@@ -61,7 +60,6 @@ if (max(at) > min(windows)) {
     alternative = c("greater", "two.sided"),
     return_power = c(1, 2))
   backcusum = backcusum_init$get_rolling_features(ohlcv)
-  fwrite(backcusum, path_) 
 }
 
 # Theft r
@@ -170,3 +168,8 @@ if (max(at) > min(windows)) {
   theft_py = suppressMessages(theft_init$get_rolling_features(ohlcv, price_col = "returns"))
   fwrite(theft_py, path_)
 }
+
+# Combine all predictors
+Reduce(function(x, y) merge(x, y, by = "date"),
+       list(ohlcv, exuber, backcusum))
+
