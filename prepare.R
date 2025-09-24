@@ -50,7 +50,7 @@ cont = sprintf(
 
 #PBS -N predictors
 #PBS -l ncpus=1
-#PBS -l mem=1GB
+#PBS -l mem=2GB
 #PBS -J 1-%d
 #PBS -o logs
 #PBS -j oe
