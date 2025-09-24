@@ -27,7 +27,7 @@ if (!dir.exists(PATH_PREDICTORS)) dir.create(PATH_PREDICTORS)
 if (Sys.info()["user"] == "sn") {
   reticulate::use_virtualenv("/home/sn/projects_py/pyquant", required = TRUE)
 } else {
-  reticulate::use_virtualenv("/opt/venv", reqired = TRUE)
+  reticulate::use_virtualenv("/opt/venv", required = TRUE)
 }
 # theftms::init_theft("/opt/venv") # ???
 tsfel = reticulate::import("tsfel")
