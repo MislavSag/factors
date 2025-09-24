@@ -3,23 +3,33 @@ library(finutils)
 
 
 # Setup
-PATH_PRICES = "D:/predictors"
+if (Sys.info()["user"] == "sn") {
+  PATH_PRICES = "/home/sn/data/strategies/factors"
+} else {
+  PATH_PRICES = "D:/predictors"
+}
+# fs::dir_delete(PATH_PRICES)
 if (!dir.exists(PATH_PRICES)) dir.create(PATH_PRICES, recursive = TRUE)
 
 # Prices data
 prices = qc_daily_parquet(
-  file_path = "F:/lean/data/all_stocks_daily",
+  file_path = "/home/sn/lean/data/all_stocks_daily",
   etfs = FALSE,
-  min_obs = 252,
+  min_obs = 600, # we can use 2 years of data + some lookback
   duplicates = "fast",
   add_dv_rank = FALSE,
   add_day_of_month = FALSE,
   profiles_fmp = TRUE,
-  fmp_api_key = Sys.getenv("APIKEY")
+  fmp_api_key = Sys.getenv("APIKEY"),
 )
 
 # Remove ETF's
 prices = prices[isEtf == FALSE & isFund == FALSE]
+
+# Remove columns we dont need
+remove_cols = c("currency", "country", "isin", "exchange", "isEtf", "isFund",
+                "etf", "ipoDate", "fmp_symbol")
+prices = prices[, .SD, .SDcols = -remove_cols]
 
 # Save every symbol separately
 prices_dir = file.path(PATH_PRICES, "prices")
@@ -52,5 +62,5 @@ apptainer run image.sif padobran_predictors.R",
 writeLines(cont, "padobran_predictors.sh")
 
 # Add to padobran
-# scp -r /home/sn/data/strategies/pead/prices padobran:/home/jmaric/peadml/prices
+# scp -r /home/sn/data/strategies/factors/prices padobran:/home/jmaric/factors/prices
 
