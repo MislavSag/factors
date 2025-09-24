@@ -6,31 +6,6 @@ From: r-base:4.5.0
   # apt
   apt-get update
   apt-get install -y libssl-dev libxml2-dev libcurl4-openssl-dev
-
-  # Fundamental packages
-  R --slave -e 'install.packages("data.table")'
-  R --slave -e 'install.packages("R6")'
-  R --slave -e 'install.packages("bit64")'
-  R --slave -e 'install.packages("remotes")'
-  R --slave -e 'remotes::install_github("MislavSag/finfeatures")'
-  R --slave -e 'install.packages("exuber")'
-  R --slave -e 'install.packages("fracdiff")'
-  R --slave -e 'install.packages("lubridate")'
-
-%runscript
-  # Script to run when the container is executed; passes commands to Rscript
-  Rscript $@
-
-
-
-Bootstrap: docker
-From: r-base:4.5.0
-
-%post
-
-  # apt
-  apt-get update
-  apt-get install -y libssl-dev libxml2-dev libcurl4-openssl-dev
   apt-get install -y python3 python3-pip python3-venv python3-dev
 
   # Setup a Python virtual environment
@@ -53,7 +28,8 @@ From: r-base:4.5.0
   R --slave -e 'install.packages("reticulate")'
   R --slave -e 'install.packages("exuber")'
   R --slave -e 'remotes::install_github("ottosven/backCUSUM")'
-  R --slave -e 'remotes::install_github("MislavSag/theftms")'
+  # R --slave -e 'remotes::install_github("MislavSag/theftms")'
+  R --slave -e 'install.packages("theft")'
   R --slave -e 'install.packages("forecast")'
   R --slave -e 'install.packages("tsfeatures")'
   R --slave -e 'install.packages("WaveletArima")'
