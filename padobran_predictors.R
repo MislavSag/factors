@@ -23,6 +23,26 @@ if (interactive()) {
 # Create directory if it doesnt exists
 if (!dir.exists(PATH_PREDICTORS)) dir.create(PATH_PREDICTORS)
 
+# Get index
+if (interactive()) {
+  i = 1L
+} else {
+  i = as.integer(Sys.getenv('PBS_ARRAY_INDEX'))
+}
+
+# Get symbol
+symbols = gsub("\\.csv", "", list.files(PATH_PRICES))
+symbol_i = symbols[i]
+
+# If files already exists cont
+file_name = file.path(PATH_PREDICTORS, paste0(symbol_i, ".csv"))
+if (!file.exists(file_name)) {
+  cat(sprintf("Processing: %s\n", symbol_i))
+} else {
+  cat(sprintf("File already exists: %s\n", file_name))
+  quit(save = "no", status = 0)
+}
+
 # python environment
 if (Sys.info()["user"] == "sn") {
   reticulate::use_virtualenv("/home/sn/projects_py/pyquant", required = TRUE)
@@ -34,17 +54,6 @@ tsfel = reticulate::import("tsfel")
 tsfresh = reticulate::import("tsfresh", convert = FALSE)
 warnigns = reticulate::import("warnings", convert = FALSE)
 warnigns$filterwarnings('ignore')
-
-# Get index
-if (interactive()) {
-  i = 1L
-} else {
-  i = as.integer(Sys.getenv('PBS_ARRAY_INDEX'))
-}
-
-# Get symbol
-symbols = gsub("\\.csv", "", list.files(PATH_PRICES))
-symbol_i = symbols[i]
 
 # Import Ohlcv data
 ohlcv_dt = fread(file.path(PATH_PRICES, paste0(symbol_i, ".csv")))
@@ -70,7 +79,7 @@ exuber = exuber_init$get_rolling_features(ohlcv, TRUE)
 
 # Backcusum
 backcusum_init = RollingBackcusum$new(
-  windows = c(windows, max(504, nr)),
+  windows = c(windows, min(504, nr)),
   workers = workers,
   at = at,
   lag = lag_,
@@ -185,6 +194,6 @@ predictors = Reduce(
 format(object.size(predictors), units = "auto")
 
 # Save predictors
-file_name = file.path(PATH_PREDICTORS, paste0(symbol_i, ".csv"))
+
 fwrite(predictors, file_name)
 cat(sprintf("Saved: %s\n", file_name))
