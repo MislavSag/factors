@@ -33,6 +33,20 @@ if (interactive()) {
 # Get symbol
 symbols = gsub("\\.csv", "", list.files(PATH_PRICES))
 symbol_i = symbols[i]
+# tsro.csv
+# tube.csv
+# tvpt.csv
+# twx.1.csv
+# twx.csv
+# uam.1.csv
+# uam.2.csv
+# uam.csv
+# ubp.csv
+# ucba.csv
+# untd.1.csv
+# untd.csv
+# uswsw.csv
+symbol_i = "tube"
 
 # If files already exists cont
 file_name = file.path(PATH_PREDICTORS, paste0(symbol_i, ".csv"))
@@ -142,7 +156,7 @@ fracdiff_init = RollingFracdiff$new(
   nar = c(1), 
   nma = c(1),
   bandw_exp = c(0.1, 0.5, 0.9))
-fracdiff = suppressMessages(fracdiff_init$get_rolling_features(ohlcv))
+fracdiff = suppressMessages(suppressWarnings(fracdiff_init$get_rolling_features(ohlcv)))
 
 # Theft r with returns
 theft_init = RollingTheft$new(
@@ -171,7 +185,7 @@ ohlcv_predictors_init = OhlcvFeaturesDaily$new(
   windows = c(22, 66, 125, 252, 504),
   quantile_divergence_window = c(22, 66, 125, 252, 504)
 )
-ohlcv_predictors = ohlcv_predictors_init$get_ohlcv_features(copy(na.omit(ohlcv_dt)))
+ohlcv_predictors = ohlcv_predictors_init$get_ohlcv_features(copy(ohlcv_dt))
 
 # Combine all predictors
 predictors = Reduce(
@@ -197,3 +211,4 @@ format(object.size(predictors), units = "auto")
 
 fwrite(predictors, file_name)
 cat(sprintf("Saved: %s\n", file_name))
+
