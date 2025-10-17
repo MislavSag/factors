@@ -191,7 +191,6 @@ predictors = Reduce(
     theft_py_r
   )
 )
-format(object.size(predictors), units = "auto")
 
 # Save predictors
 

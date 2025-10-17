@@ -85,22 +85,23 @@ predictors = setdiff(
 dt_long = melt(dt[month > 2016], id.vars = c("month", "target"), measure.vars = predictors)
 dt_long = na.omit(dt_long)
 dt_long[, .N, by = .(month, variable)]
+dt_long[, any(is.na(value))]
+dt_long[, any(is.infinite(value))]
+dt_long = dt_long[is.finite(value)]
+# variables = dt_long[, unique(variable)]
+# rococo_l = list()
+# for (i in seq_along(variables)) {
+#   print(i)
+#   var_ = variables[i]
+#   dt_long[variable == var_]
+#   rococo_l[[i]] = dt_long[variable == var_] |>
+#     _[, .(variable = var_, gamma = rococo(value, target)), by = .(month)]
+# }
 dt_roco = dt_long[, .(gamma = rococo(value, target)), by = .(month, variable)]
-dt_roco[gamma > 0.6]
-dt_roco[gamma < -0.6]
+dt_roco[gamma > 0.75]
+dt_roco[gamma < -0.75]
 
-
-# Aggregate over time: average effect, "information ratio" of gamma, stability
-cs_summary <- cs_gamma[!is.na(gamma), .(
-  T_months = .N,
-  mean_gamma = mean(gamma),
-  sd_gamma   = sd(gamma),
-  IR_gamma   = ifelse(sd(gamma) > 0, mean(gamma)/sd(gamma) * sqrt(.N), NA_real_),
-  pos_share  = mean(gamma > 0),   # fraction of months positive
-  sign_flip_rate = mean(sign(gamma) != shift(sign(gamma), type="lag"), na.rm=TRUE)
-), by = factor][order(-abs(mean_gamma))]
-
-cs_summary[]
-
-
-dt[, 1:10]
+# Mean gamma rank across all months
+cs_gamma = dt_roco[, .(gamma = mean(gamma, na.rm = TRUE)), by = variable]
+setorder(cs_gamma, -gamma)
+cs_gamma
