@@ -34,6 +34,8 @@ From: r-base:4.5.0
   R --slave -e 'install.packages("tsfeatures")'
   R --slave -e 'install.packages("WaveletArima")'
   R --slave -e 'install.packages("fracdiff")'
+  # Help packages
+  R --slave -e 'install.packages("janitor")'
 
 %environment
   # Set environment variables to use the virtual environment's Python
