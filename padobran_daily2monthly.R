@@ -1,5 +1,5 @@
 library(data.table)
-libra
+library(janitor)
 
 
 # paths
@@ -61,22 +61,9 @@ dt = dt_factors_last[dt_id, on = c("symbol", "month")]
 dt = dt_factors_mean[dt, on = c("symbol", "month")]
 setorder(dt, date)
 
-# Define predictors
-predictors = setdiff(colnames(dt), colnames(dt_id))
-
 # Remove columns with all Na observations
-janitor::remove_empty()
-
-# Remove constant columns
-remove_cols = dt[, vapply(.SD, function(x) sd(x, na.rm = TRUE) < 0.000001, logical(1)), .SDcols = predictors]
-remove_cols[is.na(remove_cols)]
-remove_cols = names(remove_cols[remove_cols == TRUE])
-cat("We remove this columns: ", remove_cols, sep = "\n")
-dt = 
-
-# Remove highly correlated predictors
-cor_mat = cor(dt[, ..cols], use = "pairwise.complete.obs")
-
+dt = remove_empty(dt, which = "rows", cutoff = 0.001, quiet = FALSE)
+dt = remove_empty(dt, which = "cols", cutoff = 0.001, quiet = FALSE)
 
 # Checks
 if (interactive()) {
@@ -85,4 +72,4 @@ if (interactive()) {
 }
 
 # Save
-
+fwrite(dt, filem)
